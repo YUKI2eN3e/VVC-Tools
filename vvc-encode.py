@@ -11,7 +11,7 @@ else:
 	exit()
 
 def make_command(input_filename, width, height, frame_rate):
-	return "ffmpeg -i \"{input_filename}\" -f rawvideo -pix_fmt yuv420p pipe:1 | vvencapp -i - -s {width}x{height} -c yuv420 -r {frame_rate}".format(input_filename=input_filename, width=width, height=height, frame_rate=frame_rate)
+	return "ffmpeg -i \"{input_filename}\" -f rawvideo -pix_fmt yuv420p pipe:1 | vvencapp -i - -s {width}x{height} -c yuv420 -r {frame_rate} --preset medium --qp 31 --qpa 0 -ip 64 -t {threads} -o \"{output_filename}.266\"".format(input_filename=input_filename, width=width, height=height, frame_rate=frame_rate, threads=(4 if height < 720 else 8), output_filename=input_filename.split('.')[0])
 
 media_info = MediaInfo.parse(input_filename)
 
