@@ -15,10 +15,10 @@ else:
 
 def make_command(input_video_filename, video_size):
 	#return ['vvdecapp.exe', '-b', input_video_filename, '-o', '-', '|', 'ffplay', '-f', 'rawvideo', '-pix_fmt', 'yuv420p10le', '-video_size', video_size, '-i', '-', '-fs']
-	return ['vvdecapp.exe', '-b', input_video_filename, '-o', '-', '|', 'ffmpeg', '-f', 'rawvideo', '-pix_fmt', 'yuv420p10le', '-video_size', video_size, '-i', '-', '-strict', '-1', '-f', 'yuv4mpegpipe', '-', '|', 'ffplay', '-f', 'yuv4mpegpipe', '-', '-fs']
+	return ['vvdecapp.exe', '-b', input_video_filename, '-o', '-', '|', 'ffmpeg', '-f', 'rawvideo', '-pix_fmt', 'yuv420p10le', '-video_size', video_size, '-i', '-', '-strict', '-1', '-f', 'yuv4mpegpipe', '-', '|', 'ffplay', '-f', 'yuv4mpegpipe', '-', '-fs', '&', 'echo', 'Done playing video']
 
 def make_command_audio(input_video_filename, video_size, input_audio_filename):
-	return ['vvdecapp.exe', '-b', input_video_filename, '-o', '-', '|', 'ffmpeg', '-f', 'rawvideo', '-pix_fmt', 'yuv420p10le', '-video_size', video_size, '-i', '-', '-i', input_audio_filename, '-c:a', 'copy', '-strict', '-1', '-f', 'matroska', '-', '|', 'ffplay', '-', '-fs']
+	return ['vvdecapp.exe', '-b', input_video_filename, '-o', '-', '|', 'ffmpeg', '-f', 'rawvideo', '-pix_fmt', 'yuv420p10le', '-video_size', video_size, '-i', '-', '-i', input_audio_filename, '-c:a', 'copy', '-strict', '-1', '-f', 'matroska', '-', '|', 'ffplay', '-', '-fs', '&', 'echo', 'Done playing video']
 
 def get_video_size(input_video_filename):
 	result = subprocess.run(['vvdecapp.exe', '-b', input_video_filename, '-f', '25', '|', 'grep', 'SizeInfo'], stdout=subprocess.PIPE, shell=True)
@@ -32,11 +32,17 @@ if 'input_audio_filename' in locals():
 			process.send_signal(signal.CTRL_C_EVENT)
 			process.terminate()
 			exit()
+		elif search("Done playing video", c):
+			process.terminate()
+			exit()
 else:
 	process = subprocess.Popen(make_command(input_video_filename, get_video_size(input_video_filename)), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
 	while True:
 		c = str(process.stdout.readline())
 		if search("Broken pipe", c):
 			process.send_signal(signal.CTRL_C_EVENT)
+			process.terminate()
+			exit()
+		elif search("Done playing video", c):
 			process.terminate()
 			exit()
