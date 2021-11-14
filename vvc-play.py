@@ -10,7 +10,7 @@ if len(sys.argv) >= 2:
 else:
 	path = sys.argv[0].split('\\')
 	name = path[len(path)-1]
-	print("Usage:\n\t%s input_video_filename" % name)
+	print("Usage:\n\t%s input_video_filename [input_audio_filename]" % name)
 	exit()
 
 def make_command(input_video_filename, video_size):
