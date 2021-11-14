@@ -1,6 +1,4 @@
-vvencFFapp.exe
-vvencinterfacetest.exe
-vvenclibtest.exe
+*.exe
 *.mp4
 *.266
 *.265
