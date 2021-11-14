@@ -1,5 +1,6 @@
 import sys
 import subprocess
+import signal
 from re import search
 
 if len(sys.argv) >= 2:
@@ -24,16 +25,18 @@ def get_video_size(input_video_filename):
 	return str(result.stdout).split(' ')[3]
 
 if 'input_audio_filename' in locals():
-	process = subprocess.Popen(make_command_audio(input_video_filename, get_video_size(input_video_filename), input_audio_filename), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,universal_newlines=True, shell=True)
+	process = subprocess.Popen(make_command_audio(input_video_filename, get_video_size(input_video_filename), input_audio_filename), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
 	while True:
 		c = str(process.stdout.readline())
 		if search("Broken pipe", c):
+			process.send_signal(signal.CTRL_C_EVENT)
 			process.terminate()
 			exit()
 else:
-	process = subprocess.Popen(make_command(input_video_filename, get_video_size(input_video_filename)), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,universal_newlines=True, shell=True)
+	process = subprocess.Popen(make_command(input_video_filename, get_video_size(input_video_filename)), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
 	while True:
 		c = str(process.stdout.readline())
 		if search("Broken pipe", c):
+			process.send_signal(signal.CTRL_C_EVENT)
 			process.terminate()
 			exit()
