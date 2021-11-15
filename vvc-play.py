@@ -21,8 +21,10 @@ def make_command_audio(input_video_filename, video_size, input_audio_filename):
 	return ['vvdecapp.exe', '-b', input_video_filename, '-o', '-', '|', 'ffmpeg', '-f', 'rawvideo', '-pix_fmt', 'yuv420p10le', '-video_size', video_size, '-i', '-', '-i', input_audio_filename, '-c:a', 'copy', '-strict', '-1', '-f', 'matroska', '-', '|', 'ffplay', '-', '-fs', '&', 'echo', 'Done playing video']
 
 def get_video_size(input_video_filename):
-	result = subprocess.run(['vvdecapp.exe', '-b', input_video_filename, '-f', '25', '|', 'grep', 'SizeInfo'], stdout=subprocess.PIPE, shell=True)
-	return str(result.stdout).split(' ')[3]
+	result = subprocess.run(['vvdecapp.exe', '-b', input_video_filename, '-f', '25'], stdout=subprocess.PIPE, universal_newlines=True, shell=True)
+	for s in result.stdout.split('\n'):
+		if 'SizeInfo' in s:
+			return str(s).split(' ')[3]
 
 if 'input_audio_filename' in locals():
 	process = subprocess.Popen(make_command_audio(input_video_filename, get_video_size(input_video_filename), input_audio_filename), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
